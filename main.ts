@@ -24,8 +24,26 @@ router
   });
 
 const app = new Application();
+app.use(oakCors()); // Enable CORS for All Routes
+// Logger
+app.use(async (ctx, next) => {
+  await next();
+  const rt = ctx.response.headers.get("X-Response-Time");
+  console.log(`${ctx.request.method} ${ctx.request.url} - ${rt}`);
+});
+
+// Timing
+app.use(async (ctx, next) => {
+  const start = Date.now();
+  await next();
+  const ms = Date.now() - start;
+  ctx.response.headers.set("X-Response-Time", `${ms}ms`);
+});
+
 app.use(async (context, next) => {
   try {
+    const response = context;
+    response.headers.set("Access-Control-Allow-Origin", "*")
     await context.send({
       root: `${Deno.cwd()}`,
       index: "index.html",
@@ -34,7 +52,6 @@ app.use(async (context, next) => {
     await next();
   }
 });
-app.use(oakCors()); // Enable CORS for All Routes
 app.use(router.routes());
 app.use(router.allowedMethods());
 
