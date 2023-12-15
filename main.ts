@@ -42,7 +42,7 @@ app.use(async (ctx, next) => {
 
 app.use(async (context, next) => {
   try {
-    const response = context;
+    const response = context.response;
     response.headers.set("Access-Control-Allow-Origin", "*")
     await context.send({
       root: `${Deno.cwd()}`,
