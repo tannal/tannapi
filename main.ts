@@ -24,6 +24,16 @@ router
   });
 
 const app = new Application();
+app.use(async (context, next) => {
+  try {
+    await context.send({
+      root: `${Deno.cwd()}`,
+      index: "index.html",
+    });
+  } catch {
+    await next();
+  }
+});
 app.use(oakCors()); // Enable CORS for All Routes
 app.use(router.routes());
 app.use(router.allowedMethods());
